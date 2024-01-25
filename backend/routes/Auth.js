@@ -8,8 +8,8 @@ var jwt = require('jsonwebtoken');
 const axios = require('axios')
 const fetch = require('../middleware/fetchdetails');
 const jwtSecret = "HaHa"
-router.post('/api/auth/login', [
-console.log("hello"),
+
+router.post('/createuser', [
     body('email').isEmail(),
     body('password').isLength({ min: 5 }),
     body('name').isLength({ min: 3 })
@@ -25,7 +25,7 @@ console.log("hello"),
     try {
         await User.create({
             name: req.body.name,
-
+            // password: req.body.password,  first write this and then use bcryptjs
             password: securePass,
             email: req.body.email,
             location: req.body.location
@@ -48,6 +48,7 @@ console.log("hello"),
     }
 })
 
+// Authentication a User, No login Requiered
 router.post('/login', [
     body('email', "Enter a Valid Email").isEmail(),
     body('password', "Password cannot be blank").exists(),
@@ -60,7 +61,7 @@ router.post('/login', [
 
     const { email, password } = req.body;
     try {
-        let user = await User.findOne({ email }); 
+        let user = await User.findOne({ email });  //{email:email} === {email}
         if (!user) {
             return res.status(400).json({ success, error: "Try Logging in with correct credentials" });
         }
@@ -85,6 +86,7 @@ router.post('/login', [
     }
 })
 
+// Get logged in User details, Login Required.
 router.post('/getuser', fetch, async (req, res) => {
     try {
         const userId = req.user.id;
@@ -96,6 +98,7 @@ router.post('/getuser', fetch, async (req, res) => {
 
     }
 })
+// Get logged in User details, Login Required.
 router.post('/getlocation', async (req, res) => {
     try {
         let lat = req.body.latlong.lat
@@ -104,7 +107,10 @@ router.post('/getlocation', async (req, res) => {
         let location = await axios
             .get("https://api.opencagedata.com/geocode/v1/json?q=" + lat + "+" + long + "&key=74c89b3be64946ac96d777d08b878d43")
             .then(async res => {
+                // console.log(`statusCode: ${res.status}`)
                 console.log(res.data.results)
+                // let response = stringify(res)
+                // response = await JSON.parse(response)
                 let response = res.data.results[0].components;
                 console.log(response)
                 let { village, county, state_district, state, postcode } = response
@@ -123,6 +129,9 @@ router.post('/getlocation', async (req, res) => {
 })
 router.post('/foodData', async (req, res) => {
     try {
+        // console.log( JSON.stringify(global.foodData))
+        // const userId = req.user.id;
+        // await database.listCollections({name:"food_items"}).find({});
         res.send([global.foodData, global.foodCategory])
     } catch (error) {
         console.error(error.message)

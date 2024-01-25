@@ -50,7 +50,7 @@ export default function Login() {
             <label htmlFor="exampleInputPassword1" className="form-label">Password</label>
             <input type="password" className="form-control" value={credentials.password} onChange={onChange} name='password' />
           </div>
-          <button type="submit" className="m-3 btn btn-success" onClick={handleSubmit}>Submit</button>
+          <button type="submit" className="m-3 btn btn-success">Submit</button>
           <Link to="/signup" className="m-3 mx-1 btn btn-danger">New User</Link>
         </form>
 
